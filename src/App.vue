@@ -23,6 +23,11 @@ import {Todo} from './models';
 
 export default {
   name: 'app',
+  updated(){
+    DataStore.observe(Todo).subscribe(todos => {
+      console.log(JSON.stringify(todos,null,2))
+    })
+  },
   methods: {
    async createTodo(){
      const todo = await DataStore.save(new Todo({name:"a",description:"bb"}))
