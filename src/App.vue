@@ -21,12 +21,24 @@ import { DataStore, Predicates } from 'aws-amplify';
 import {Todo} from './models';
  //import { AuthState, onAuthUIStateChange } from '@aws-amplify/ui-components'
 
+
+ 
+
 export default {
   name: 'app',
-  updated(){
-    DataStore.observe(Todo).subscribe(todos => {
-      console.log(JSON.stringify(todos,null,2))
+  data(){
+    return {
+      subscription: undefined
+    }
+  },
+  created(){
+    this.subscription = DataStore.observe(Todo).subscribe(msg => {
+      console.log(msg.model, msg.opType, msg.element);
     })
+  },
+  unmounted(){
+    if (!this.subscription) return;
+    this.subscription.unsubscribe()
   },
   methods: {
    async createTodo(){
