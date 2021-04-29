@@ -5,6 +5,7 @@
           <form v-on:submit.prevent>
             <button @click="createTodo">createTodo</button>
             <button @click="getTodos">getTodos</button>
+            <button @click="deleteTodos">deleteTodos</button>
           </form>
         <amplify-sign-out></amplify-sign-out>
       </div>
@@ -13,7 +14,7 @@
 </template>
 
 <script>
-import { DataStore } from 'aws-amplify';
+import { DataStore, Predicates } from 'aws-amplify';
 // //import { createTodo } from './graphql/mutations';
 // //import { listTodos } from './graphql/queries';
 // import { onCreateTodo } from './graphql/subscriptions';
@@ -30,7 +31,11 @@ export default {
    async getTodos(){
      const todos = await DataStore.query(Todo)
      console.log("todos get successfully",JSON.stringify(todos, null, 2))
-   }
+   },
+   async deleteTodos(){
+     await DataStore.delete(Todo,Predicates.ALL)
+     console.log("todos delete successfully")
+   }   
   }
 }
 
