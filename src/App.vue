@@ -1,67 +1,38 @@
 <template>
- <amplify-authenticator>
   <div id="app">
-    <h1>Todo App</h1>
-    <input type="text" v-model="name" placeholder="Todo name">
-    <input type="text" v-model="description" placeholder="Todo description">
-    <button v-on:click="createTodo">Create Todo</button>
-    <div v-for="item in todos" :key="item.id">
-      <h3>{{ item.name }}</h3>
-      <p>{{ item.description }}</p>
-    </div>
+    <amplify-authenticator>
+      <div>
+          <form v-on:submit.prevent>
+            <button @click="createTodo">createTodo</button>
+            <button @click="getTodos">getTodos</button>
+          </form>
+        <amplify-sign-out></amplify-sign-out>
+      </div>
+    </amplify-authenticator>
   </div>
-  <amplify-sign-out></amplify-sign-out>
- </amplify-authenticator>
 </template>
 
 <script>
-import { API } from 'aws-amplify';
-import { createTodo } from './graphql/mutations';
-import { listTodos } from './graphql/queries';
-import { onCreateTodo } from './graphql/subscriptions';
+import { DataStore } from 'aws-amplify';
+// //import { createTodo } from './graphql/mutations';
+// //import { listTodos } from './graphql/queries';
+// import { onCreateTodo } from './graphql/subscriptions';
+import {Todo} from './models';
+ //import { AuthState, onAuthUIStateChange } from '@aws-amplify/ui-components'
 
 export default {
-  name: 'App',
-  async created() {
-    this.getTodos();
-    this.subscribe();
-  },
-  data() {
-    return {
-      name: '',
-      description: '',
-      todos: []
-    }
-  },
+  name: 'app',
   methods: {
-    async createTodo() {
-      const { name, description } = this;
-      if (!name || !description) return;
-      const todo = { name, description };
-      this.todos = [...this.todos, todo];
-      await API.graphql({
-        query: createTodo,
-        variables: {input: todo},
-      });
-      this.name = '';
-      this.description = '';
+   async createTodo(){
+     const todo = await DataStore.save(new Todo({name:"a",description:"bb"}))
+     console.log(todo)
     },
-    async getTodos() {
-      const todos = await API.graphql({
-        query: listTodos
-      });
-      this.todos = todos.data.listTodos.items;
-    },
-    async subscribe() {
-      await API.graphql({ query: onCreateTodo })
-        .subscribe({
-          next: (eventData) => {
-            let todo = eventData.value.data.onCreateTodo;
-            if (this.todos.some(item => item.name === todo.name)) return; // remove duplications
-            this.todos = [...this.todos, todo];
-          }
-        });
-    }
+   async getTodos(){
+     const todos = await DataStore.query(Todo)
+     console.log("todos get successfully",JSON.stringify(todos, null, 2))
+   }
   }
-};
+}
+
+
 </script>
