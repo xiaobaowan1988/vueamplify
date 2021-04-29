@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { DataStore, Predicates } from 'aws-amplify';
+import { DataStore, Predicates } from '@aws-amplify/datastore';
 // //import { createTodo } from './graphql/mutations';
 // //import { listTodos } from './graphql/queries';
 // import { onCreateTodo } from './graphql/subscriptions';
